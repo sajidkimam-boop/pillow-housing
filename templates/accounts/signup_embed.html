@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join the Pillow Housing Beta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #5a2c8a;
+            --primary-purple-light: #6d3996;
+            --surface: #ffffff;
+            --background: #f5f3f8;
+            --border: #d8d5d5;
+            --text-primary: #000000;
+            --text-secondary: #4a4a4a;
+            --text-muted: #6b7280;
+            --error: #b42318;
+            --error-bg: #fef3f2;
+            --shadow-lg: 0 16px 40px rgba(90, 44, 138, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .shell {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+        }
+
+        .card {
+            width: min(100%, 600px);
+            background: var(--surface);
+            border: 1px solid rgba(90, 44, 138, 0.14);
+            border-radius: 22px;
+            box-shadow: var(--shadow-lg);
+            padding: 18px 20px 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: clamp(1.45rem, 3.4vw, 2.2rem);
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+            text-align: center;
+        }
+
+        .subtitle {
+            margin: 6px 0 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        form {
+            margin-top: 16px;
+        }
+
+        .field {
+            margin-bottom: 11px;
+        }
+
+        .field-grid {
+            display: grid;
+            gap: 11px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 13px;
+            font: inherit;
+            color: var(--text-primary);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 4px rgba(90, 44, 138, 0.1);
+        }
+
+        .hint {
+            margin-top: 4px;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+        }
+
+        .error-list,
+        .field-error {
+            margin-top: 4px;
+            color: var(--error);
+            font-size: 0.78rem;
+        }
+
+        .error-banner {
+            margin-bottom: 12px;
+            border: 1px solid rgba(180, 35, 24, 0.15);
+            background: var(--error-bg);
+            color: var(--error);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .submit {
+            width: 100%;
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 14px;
+            background: var(--primary-purple);
+            color: #ffffff;
+            font: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .submit:hover {
+            background: var(--primary-purple-light);
+            transform: translateY(-1px);
+        }
+
+        .divider {
+            margin: 14px 0 0;
+            border: 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .footer {
+            margin-top: 12px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+        }
+
+        .footer a {
+            color: #3953ff;
+        }
+
+        @media (min-width: 640px) {
+            .field-grid.two-up {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                align-items: start;
+            }
+        }
+
+        .success {
+            text-align: center;
+            padding: 8px 0 4px;
+        }
+
+        .success-badge {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 14px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            background: rgba(90, 44, 138, 0.1);
+            color: var(--primary-purple);
+            font-size: 1.7rem;
+            font-weight: 700;
+        }
+
+        .success h2 {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: -0.03em;
+        }
+
+        .success p {
+            margin: 10px auto 0;
+            max-width: 32rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                padding: 0;
+            }
+
+            .card {
+                min-height: 100vh;
+                border-radius: 0;
+                padding: 18px 16px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <div class="card">
+            {% if success %}
+                <div class="success">
+                    <div class="success-badge">✓</div>
+                    <h2>Account created</h2>
+                    <p>
+                        Your Pillow Housing beta account for <strong>{{ created_user.email }}</strong>
+                        has been created successfully. You can close this window and return to the beta site.
+                    </p>
+                </div>
+                <script>
+                    window.parent.postMessage(
+                        {
+                            type: "pillow-signup-success",
+                            email: "{{ created_user.email|escapejs }}",
+                        },
+                        "{{ beta_site_origin|escapejs }}"
+                    );
+                </script>
+            {% else %}
+                <h1>Sign Up for Pillow Housing</h1>
+                <p class="subtitle">Join with your .edu email</p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="error-banner">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="field">
+                        <label for="{{ form.username.id_for_label }}">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="field-error">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="field">
+                        <label for="{{ form.email.id_for_label }}">Email (.edu required)</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="field-error">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="field-grid two-up">
+                        <div class="field">
+                            <label for="{{ form.school.id_for_label }}">School/University</label>
+                            {{ form.school }}
+                            {% if form.school.errors %}
+                                <div class="field-error">{{ form.school.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="field">
+                            <label for="{{ form.grad_year.id_for_label }}">Graduation Year (Optional)</label>
+                            {{ form.grad_year }}
+                            {% if form.grad_year.errors %}
+                                <div class="field-error">{{ form.grad_year.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="field-grid two-up">
+                        <div class="field">
+                            <label for="{{ form.password1.id_for_label }}">Password</label>
+                            {{ form.password1 }}
+                            <div class="hint">At least 8 characters</div>
+                            {% if form.password1.errors %}
+                                <div class="field-error">{{ form.password1.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="field">
+                            <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="field-error">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit">Create Account</button>
+                </form>
+
+                <hr class="divider">
+
+                <p class="footer">
+                    Already have an account? <a href="{% url 'login' %}" target="_top" rel="noopener noreferrer">Login here</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
