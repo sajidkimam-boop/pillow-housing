@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_exempt
 from .forms import SignUpForm
 
@@ -20,12 +21,12 @@ def signup(request):
 
 
 @xframe_options_exempt
+@csrf_exempt
 def signup_embed(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
             response = render(
                 request,
                 'accounts/signup_embed.html',
