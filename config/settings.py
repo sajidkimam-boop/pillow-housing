@@ -24,6 +24,14 @@ ALLOWED_HOSTS = [
 ]
 
 BETA_SITE_ORIGIN = os.getenv('BETA_SITE_ORIGIN', 'https://pillowhousing.com').rstrip('/')
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip().rstrip('/')
+    for origin in os.getenv(
+        'CSRF_TRUSTED_ORIGINS',
+        f'{BETA_SITE_ORIGIN},https://pillowhousing.com,https://www.pillowhousing.com',
+    ).split(',')
+    if origin.strip()
+]
 
 
 
@@ -166,6 +174,8 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'None'
+    CSRF_COOKIE_SAMESITE = 'None'
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
