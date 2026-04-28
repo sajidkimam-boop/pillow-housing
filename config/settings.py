@@ -33,6 +33,20 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.strip()
 ]
 
+SITE_GATE_ENABLED = True
+SITE_GATE_PASSWORD = 'Wazzam'
+SITE_GATE_SESSION_KEY = 'site_gate_passed'
+SITE_GATE_PUBLIC_PATH_PREFIXES = (
+    '/access/',
+    '/accounts/signup/',
+    '/accounts/signup/embed/',
+    '/webhook/stripe/',
+    '/static/',
+    '/media/',
+    '/favicon.ico',
+)
+SITE_GATE_IS_ACTIVE = SITE_GATE_ENABLED and bool(SITE_GATE_PASSWORD)
+
 
 
 # Application definition
@@ -59,6 +73,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'config.access_gate.SiteAccessGateMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
