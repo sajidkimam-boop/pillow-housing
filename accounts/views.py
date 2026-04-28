@@ -1,64 +1,69 @@
-from django.conf import settings
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.clickjacking import xframe_options_exempt
-from .forms import SignUpForm
+import json
+import logging
 
-def signup(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, 'Welcome to Pillow Housing!')
-            return redirect('home')
-    else:
-        form = SignUpForm()
-    return render(request, 'accounts/signup.html', {'form': form})
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.shortcuts import redirect, render
+from django.middleware.csrf import get_token
+
+logger = logging.getLogger(__name__)
 
 
-@xframe_options_exempt
-@csrf_exempt
+@ensure_csrf_cookie
+def get_csrf_token(request):
+        """Endpoint to get a CSRF token for embed iframes."""
+        return JsonResponse({"csrfToken": get_token(request)})
+
+
+@require_POST
 def signup_embed(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            response = render(
-                request,
-                'accounts/signup_embed.html',
-                {
-                    'form': SignUpForm(),
-                    'success': True,
-                    'created_user': user,
-                    'beta_site_origin': settings.BETA_SITE_ORIGIN,
-                },
-            )
-            response['Content-Security-Policy'] = (
-                f"frame-ancestors 'self' {settings.BETA_SITE_ORIGIN}"
-            )
-            return response
-    else:
-        form = SignUpForm()
+        """
+            Handles signup from the embedded iframe form.
+                CSRF is enforced (no @csrf_exempt).
+                    """
+        try:
+                    data = json.loads(request.body)
+except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON payload."}, status=400)
 
-    response = render(
-        request,
-        'accounts/signup_embed.html',
-        {
-            'form': form,
-            'success': False,
-            'beta_site_origin': settings.BETA_SITE_ORIGIN,
-        },
-    )
-    response['Content-Security-Policy'] = (
-        f"frame-ancestors 'self' {settings.BETA_SITE_ORIGIN}"
-    )
-    return response
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "")
+    first_name = data.get("first_name", "").strip()
+    last_name = data.get("last_name", "").strip()
 
-@login_required
-def profile(request):
-    return render(request, 'accounts/profile.html', {'user': request.user})
+    if not email or not password:
+                return JsonResponse({"error": "Email and password are required."}, status=400)
 
+    if len(password) < 8:
+                return JsonResponse({"error": "Password must be at least 8 characters."}, status=400)
+
+    if User.objects.filter(username=email).exists():
+                return JsonResponse({"error": "An account with this email already exists."}, status=409)
+
+    try:
+                user = User.objects.create_user(
+                                username=email,
+                                email=email,
+                                password=password,
+                                first_name=first_name,
+                                last_name=last_name,
+                )
+except Exception as exc:
+            logger.exception("Failed to create user: %s", exc)
+            return JsonResponse({"error": "Account creation failed. Please try again."}, status=500)
+
+    # Log the user in immediately after signup
+        user = authenticate(request, username=email, password=password)
+    if user is not None:
+                login(request, user)
+
+    return JsonResponse({"success": True, "message": "Account created successfully."})
+
+
+def logout_view(request):
+        from django.contrib.auth import logout
+        logout(request)
+        return redirect("landing")
