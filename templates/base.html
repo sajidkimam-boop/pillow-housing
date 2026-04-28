@@ -1,369 +1,467 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Pillow Housing - Student Sublets{% endblock %}</title>
+    <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>{% block title %}Pillow Housing - Student Sublets{% endblock %}</title>
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      <!-- SEO & Open Graph -->
+      <meta name="description" content="{% block meta_description %}Find and post student sublets near your university. Pillow Housing connects college and grad students with short-term housing.{% endblock %}">
+      <meta property="og:type" content="website">
+      <meta property="og:site_name" content="Pillow Housing">
+      <meta property="og:title" content="{% block og_title %}Pillow Housing - Student Sublets{% endblock %}">
+      <meta property="og:description" content="{% block og_description %}Find and post student sublets near your university.{% endblock %}">
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:title" content="Pillow Housing - Student Sublets">
+      <meta name="theme-color" content="#5a2c8a">
     
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+      <!-- Bootstrap CSS -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Leaflet CSS for Maps -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+      <!-- Bootstrap Icons -->
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+      <!-- Leaflet CSS — only loaded on pages that need it -->
+      {% block leaflet_css %}{% endblock %}
     
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+      <!-- Google Fonts -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    {% block extra_css %}{% endblock %}
+      <!-- Custom CSS -->
+      <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     
-    <style>
-        /* Pillow Housing Brand Color Scheme */
-        :root {
-            /* Brand Colors */
-            --primary-purple: #5a2c8a;
-            --primary-purple-light: #6d3996;
-            --accent-lavender: #d0aee4;
-            --neutral-gray: #d8d5d5;
-            --text-black: #000000;
-            --white: #ffffff;
-            
-            /* Backgrounds */
-            --background: #fafaf9;
-            --surface: #ffffff;
-            
-            /* Text Colors */
-            --text-primary: #000000;
-            --text-secondary: #4a4a4a;
-            --text-muted: #6b7280;
-            
-            /* Shadows */
-            --shadow-sm: 0 1px 3px rgba(90, 44, 138, 0.08);
-            --shadow-md: 0 4px 12px rgba(90, 44, 138, 0.12);
-            --shadow-lg: 0 12px 32px rgba(90, 44, 138, 0.18);
-        }
-        
-        /* Global Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: var(--background);
-            color: var(--text-primary);
-            line-height: 1.6;
-            font-size: 15px;
-        }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-            font-weight: 600;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
-        }
-        
-        /* Navbar */
-        .navbar {
-            background-color: var(--white) !important;
-            border-bottom: 1px solid var(--neutral-gray);
-            box-shadow: var(--shadow-sm);
-            padding: 1rem 0;
-        }
-        
-        .navbar-brand {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--primary-purple) !important;
-        }
-        
-        .navbar-brand img {
-            height: 45px;
-            transition: transform 0.2s;
-        }
-        
-        .navbar-brand:hover img {
-            transform: scale(1.05);
-        }
-        
-        .nav-link {
-            color: var(--text-secondary) !important;
-            font-weight: 500;
-            transition: all 0.2s;
-            padding: 0.5rem 1rem !important;
-            border-radius: 8px;
-        }
-        
-        .nav-link:hover {
-            color: var(--primary-purple) !important;
-            background-color: rgba(90, 44, 138, 0.05);
-        }
-        
-        /* Buttons */
-        .btn {
-            font-weight: 500;
-            border-radius: 10px;
-            padding: 0.625rem 1.25rem;
-            transition: all 0.2s;
-            border: none;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-purple);
-            color: white;
-            box-shadow: 0 2px 8px rgba(90, 44, 138, 0.25);
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-purple-light);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(90, 44, 138, 0.4);
-        }
-        
-        .btn-outline-primary {
-            color: var(--primary-purple);
-            border: 2px solid var(--primary-purple);
-            background: transparent;
-        }
-        
-        .btn-outline-primary:hover {
-            background-color: var(--primary-purple);
-            border-color: var(--primary-purple);
-            color: white;
-        }
-        
-        /* Cards */
-        .card {
-            background-color: var(--surface);
-            border: 1px solid var(--neutral-gray);
-            border-radius: 16px;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s;
-        }
-        
-        .card:hover {
-            box-shadow: var(--shadow-md);
-        }
-        
-        .listing-card {
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-        
-        .listing-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-lg);
-        }
-        
-        /* Forms */
-        .form-control, .form-select {
-            border: 2px solid var(--neutral-gray);
-            border-radius: 10px;
-            padding: 0.75rem 1rem;
-            transition: all 0.2s;
-        }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-purple);
-            box-shadow: 0 0 0 4px rgba(90, 44, 138, 0.1);
-            outline: none;
-        }
-        
-        /* Badges */
-        .badge {
-            font-weight: 600;
-            padding: 0.5rem 0.875rem;
-            border-radius: 8px;
-        }
-        
-        .bg-warning {
-            background-color: #f59e0b !important;
-        }
-        
-        /* Alerts */
-        .alert {
-            border-radius: 12px;
-            border: none;
-            box-shadow: var(--shadow-sm);
-        }
-        
-        /* Dropdown */
-        .dropdown-menu {
-            border: 1px solid var(--neutral-gray);
-            border-radius: 12px;
-            box-shadow: var(--shadow-md);
-        }
-        
-        .dropdown-item:hover {
-            background-color: rgba(90, 44, 138, 0.05);
-            color: var(--primary-purple);
-        }
-        
-        /* Footer */
-        footer {
-            background-color: var(--primary-purple);
-            color: white;
-            margin-top: 4rem;
-        }
+      {% block extra_css %}{% endblock %}
+    
+      <style>
+              /* ───── Pillow Housing Design System ───── */
+              :root {
+                        --primary-purple:       #5a2c8a;
+                        --primary-purple-light: #6d3996;
+                        --primary-purple-dark:  #461f6e;
+                        --accent-lavender:      #d0aee4;
+                        --accent-mint:          #d4f5e9;
+                        --neutral-gray:         #e2e0e0;
+                        --neutral-light:        #f5f4f4;
+                        --white:                #ffffff;
+                        --background:           #fafaf9;
+                        --surface:              #ffffff;
+                        --text-primary:         #111111;
+                        --text-secondary:       #4a4a4a;
+                        --text-muted:           #6b7280;
+                        --shadow-sm:  0 1px 3px rgba(90,44,138,.08);
+                        --shadow-md:  0 4px 12px rgba(90,44,138,.12);
+                        --shadow-lg:  0 12px 32px rgba(90,44,138,.18);
+                        --radius-sm:  8px;
+                        --radius-md:  12px;
+                        --radius-lg:  16px;
+                        --radius-xl:  24px;
+              }
 
-        footer h5,
-        footer h6 {
-            color: white;
-            font-weight: 700;
-        }
+              *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        footer p,
-        footer li,
-        footer small {
-            color: white;
-            font-weight: 400;
-        }
-        
-        footer a {
-            color: white;
-            font-weight: 400;
-            transition: all 0.2s;
-        }
-        
-        footer a:hover {
-            color: var(--accent-lavender);
-        }
-    </style>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{% url 'landing' %}">
-                <img src="{% static 'images/logo.jpg' %}" alt="Pillow Housing" class="me-2">
-                Pillow Housing
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'search_results' %}">
-                            <i class="bi bi-search"></i> Browse
-                        </a>
-                    </li>
-                    
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'create_listing' %}">
-                                <i class="bi bi-plus-circle"></i> Post Listing
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'my_listings' %}">
-                                <i class="bi bi-card-list"></i> My Listings
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'saved_listings' %}">
-                                <i class="bi bi-heart"></i> Saved
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle"></i> {{ user.username }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="bi bi-person"></i> Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="post" action="{% url 'logout' %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="bi bi-box-arrow-right"></i> Logout
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-primary text-white ms-2" href="{% url 'signup' %}">Sign Up</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+              html { scroll-behavior: smooth; }
+
+              body {
+                        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                        background-color: var(--background);
+                        color: var(--text-primary);
+                        line-height: 1.65;
+                        font-size: clamp(14px, 1.5vw, 16px);
+                        -webkit-font-smoothing: antialiased;
+              }
+
+              h1, h2, h3, h4, h5, h6 {
+                        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+                        font-weight: 700;
+                        color: var(--text-primary);
+                        letter-spacing: -0.025em;
+                        line-height: 1.25;
+              }
+
+              /* ── Navbar ── */
+              .navbar {
+                        background-color: var(--white) !important;
+                        border-bottom: 1px solid var(--neutral-gray);
+                        box-shadow: var(--shadow-sm);
+                        padding: 0.875rem 0;
+              }
+              .navbar-brand {
+                        font-family: 'Plus Jakarta Sans', sans-serif;
+                        font-weight: 800;
+                        font-size: clamp(1.2rem, 2vw, 1.5rem);
+                        color: var(--primary-purple) !important;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+              }
+              .navbar-brand img {
+                        height: 40px;
+                        width: auto;
+                        transition: transform 0.2s;
+              }
+              .navbar-brand:hover img { transform: scale(1.05); }
+
+              .nav-link {
+                        color: var(--text-secondary) !important;
+                        font-weight: 500;
+                        font-size: 0.9rem;
+                        transition: all 0.2s;
+                        padding: 0.45rem 0.9rem !important;
+                        border-radius: var(--radius-sm);
+              }
+              .nav-link:hover {
+                        color: var(--primary-purple) !important;
+                        background-color: rgba(90,44,138,.06);
+              }
+              .nav-link.active {
+                        color: var(--primary-purple) !important;
+                        font-weight: 600;
+              }
+
+              /* ── Buttons ── */
+              .btn {
+                        font-weight: 600;
+                        border-radius: var(--radius-md);
+                        padding: 0.6rem 1.3rem;
+                        transition: all 0.2s;
+                        font-size: 0.9rem;
+                        letter-spacing: 0.01em;
+              }
+              .btn-primary {
+                        background-color: var(--primary-purple);
+                        border-color: var(--primary-purple);
+                        color: #fff;
+                        box-shadow: 0 2px 8px rgba(90,44,138,.28);
+              }
+              .btn-primary:hover, .btn-primary:focus {
+                        background-color: var(--primary-purple-dark);
+                        border-color: var(--primary-purple-dark);
+                        transform: translateY(-1px);
+                        box-shadow: 0 6px 18px rgba(90,44,138,.38);
+              }
+              .btn-outline-primary {
+                        color: var(--primary-purple);
+                        border: 2px solid var(--primary-purple);
+                        background: transparent;
+              }
+              .btn-outline-primary:hover {
+                        background-color: var(--primary-purple);
+                        border-color: var(--primary-purple);
+                        color: #fff;
+              }
+              .btn-lg { padding: 0.8rem 2rem; font-size: 1rem; border-radius: var(--radius-lg); }
+
+              /* ── Cards ── */
+              .card {
+                        background: var(--surface);
+                        border: 1px solid var(--neutral-gray);
+                        border-radius: var(--radius-lg);
+                        box-shadow: var(--shadow-sm);
+                        transition: box-shadow 0.25s, transform 0.25s;
+                        overflow: hidden;
+              }
+              .card:hover { box-shadow: var(--shadow-md); }
+
+              .listing-card { text-decoration: none; color: inherit; }
+              .listing-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+
+              /* ── Forms ── */
+              .form-control, .form-select {
+                        border: 1.5px solid var(--neutral-gray);
+                        border-radius: var(--radius-sm);
+                        padding: 0.7rem 1rem;
+                        font-size: 0.95rem;
+                        transition: border-color 0.2s, box-shadow 0.2s;
+                        background-color: #fff;
+              }
+              .form-control:focus, .form-select:focus {
+                        border-color: var(--primary-purple);
+                        box-shadow: 0 0 0 3px rgba(90,44,138,.12);
+                        outline: none;
+              }
+              .form-label { font-weight: 500; font-size: 0.9rem; margin-bottom: 0.4rem; color: var(--text-secondary); }
+
+              /* ── Badges ── */
+              .badge {
+                        font-weight: 600;
+                        padding: 0.4rem 0.8rem;
+                        border-radius: var(--radius-sm);
+                        font-size: 0.78rem;
+                        letter-spacing: 0.02em;
+              }
+              .badge-verified {
+                        background-color: rgba(52,211,153,.15);
+                        color: #059669;
+                        border: 1px solid rgba(52,211,153,.3);
+              }
+
+              /* ── Alerts ── */
+              .alert { border-radius: var(--radius-md); border: none; box-shadow: var(--shadow-sm); font-size: 0.9rem; }
+
+              /* ── Dropdown ── */
+              .dropdown-menu {
+                        border: 1px solid var(--neutral-gray);
+                        border-radius: var(--radius-md);
+                        box-shadow: var(--shadow-md);
+                        font-size: 0.9rem;
+                        padding: 0.5rem;
+              }
+              .dropdown-item {
+                        border-radius: var(--radius-sm);
+                        padding: 0.5rem 0.75rem;
+                        font-weight: 500;
+                        transition: background 0.15s;
+              }
+              .dropdown-item:hover {
+                        background-color: rgba(90,44,138,.06);
+                        color: var(--primary-purple);
+              }
+
+              /* ── Utility ── */
+              .text-purple { color: var(--primary-purple) !important; }
+              .bg-purple { background-color: var(--primary-purple) !important; }
+              .bg-purple-soft { background-color: rgba(90,44,138,.06); }
+              .section-title {
+                        font-size: clamp(1.5rem, 3vw, 2.2rem);
+                        font-weight: 800;
+                        letter-spacing: -0.03em;
+              }
+              .section-subtitle {
+                        font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+                        color: var(--text-muted);
+                        max-width: 560px;
+              }
+
+              /* ── Footer ── */
+              footer {
+                        background: linear-gradient(135deg, var(--primary-purple-dark) 0%, var(--primary-purple) 60%, var(--primary-purple-light) 100%);
+                        color: #fff;
+                        margin-top: 5rem;
+                        position: relative;
+              }
+              footer::before {
+                        content: '';
+                        position: absolute;
+                        top: 0; left: 0; right: 0;
+                        height: 3px;
+                        background: linear-gradient(90deg, var(--accent-lavender), #fff, var(--accent-lavender));
+                        opacity: 0.4;
+              }
+              footer h5, footer h6 { color: #fff; font-weight: 700; margin-bottom: 1rem; }
+              footer p, footer li, footer small { color: rgba(255,255,255,.82); font-size: 0.875rem; }
+              footer a { color: rgba(255,255,255,.82); text-decoration: none; transition: color 0.2s; }
+              footer a:hover { color: var(--accent-lavender); }
+              .footer-divider {
+                        border: none;
+                        height: 1px;
+                        background: rgba(255,255,255,.15);
+                        margin: 1.5rem 0;
+              }
+              .footer-legal a { font-size: 0.8rem; color: rgba(255,255,255,.6); margin: 0 0.5rem; }
+              .footer-legal a:hover { color: #fff; }
+
+              /* ── Responsive tweaks ── */
+              @media (max-width: 768px) {
+                        footer { text-align: center; }
+                        footer .col-md-4 { margin-bottom: 1.5rem; }
+              }
+
+              /* ── Skip link for a11y ── */
+              .skip-link {
+                        position: absolute;
+                        top: -100%;
+                        left: 1rem;
+                        background: var(--primary-purple);
+                        color: #fff;
+                        padding: 0.5rem 1rem;
+                        border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+                        z-index: 9999;
+                        font-weight: 600;
+              }
+              .skip-link:focus { top: 0; }
+            </style>
+    </head>
+    <body>
+          <a href="#main-content" class="skip-link">Skip to main content</a>a>
+
+          <!-- Navbar -->
+          <nav class="navbar navbar-expand-lg navbar-light sticky-top" role="navigation" aria-label="Main navigation">
+                  <div class="container">
+                            <a class="navbar-brand" href="{% url 'landing' %}">
+                                        <img src="{% static 'images/logo.jpg' %}" alt="Pillow Housing logo" width="40" height="40">
+                                        Pillow Housing
+                            </a>a>
+
+                            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                                              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                                        <span class="navbar-toggler-icon"></span>span>
+                            </button>button>
+
+                            <div class="collapse navbar-collapse" id="navbarNav">
+                                        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                                                      <li class="nav-item">
+                                                                      <a class="nav-link" href="{% url 'search_results' %}">
+                                                                                        <i class="bi bi-search me-1"></i>i>Browse
+                                                                      </a>a>
+                                                      </li>li>
+
+                                                      {% if user.is_authenticated %}
+                                                      <li class="nav-item">
+                                                                      <a class="nav-link" href="{% url 'create_listing' %}">
+                                                                                        <i class="bi bi-plus-circle me-1"></i>i>Post Listing
+                                                                      </a>a>
+                                                      </li>li>
+                                                      <li class="nav-item">
+                                                                      <a class="nav-link" href="{% url 'my_listings' %}">
+                                                                                        <i class="bi bi-card-list me-1"></i>i>My Listings
+                                                                      </a>a>
+                                                      </li>li>
+                                                      <li class="nav-item">
+                                                                      <a class="nav-link" href="{% url 'saved_listings' %}">
+                                                                                        <i class="bi bi-heart me-1"></i>i>Saved
+                                                                      </a>a>
+                                                      </li>li>
+                                                      <li class="nav-item dropdown">
+                                                                      <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#"
+                                                                                         id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                                        <i class="bi bi-person-circle"></i>i>
+                                                                                        <span>{{ user.first_name|default:user.username }}</span>
+                                                                      </a>a>
+                                                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
+                                                                  <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="bi bi-person me-2"></i>i>Profile</a>a></li>
+                                                                    <li><hr class="dropdown-divider my-1"></li>
+                                                                    <li>
+                                                                                        <form method="post" action="{% url 'logout' %}">
+                                                                                                              {% csrf_token %}
+                                                                                                              <button type="submit" class="dropdown-item text-danger">
+                                                                                                                                      <i class="bi bi-box-arrow-right me-2"></i>i>Logout
+                                                                                                                  </button>button>
+                                                                                            </form>form>
+                                                                    </li>
+                                                    </ul>ul>
+                                                      </li>
+
+                                                      {% else %}
+                                                      <li class="nav-item">
+                                                                      <a class="nav-link" href="{% url 'login' %}">Log in</a>a>
+                                                      </li>
+                                                      <li class="nav-item ms-lg-2">
+                                                                      <a class="btn btn-primary px-4" href="{% url 'signup' %}">Sign Up Free</a>a>
+                                                      </li>
+                                                      {% endif %}
+                                        </ul>ul>
+                            </div>div>
+                  </div>div>
+          </nav>nav>
+
+          <!-- Flash Messages -->
+          {% if messages %}
+          <div class="container mt-3" role="alert" aria-live="polite">
+                  {% for message in messages %}
+                  <div class="alert alert-{{ message.tags }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                            {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill me-2 text-success"></i>i>
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}<i class="bi bi-exclamation-circle-fill me-2 text-danger"></i>i>
+                            {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i>i>
+                            {% else %}<i class="bi bi-info-circle-fill me-2 text-info"></i>i>{% endif %}
+                            <span>{{ message }}</span>
+                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>button>
+                  </div>div>
+                  {% endfor %}
+          </div>div>
+          {% endif %}
+
+          <!-- Main Content -->
+          <main id="main-content">
+                  {% block content %}{% endblock %}
+          </main>main>
+
+          <!-- Footer -->
+          <footer class="py-5" role="contentinfo">
+                  <div class="container">
+                            <div class="row g-4">
+
+                                        <!-- Brand column -->
+                                        <div class="col-md-4">
+                                                      <h5 class="d-flex align-items-center gap-2">
+                                                                      <i class="bi bi-house-heart-fill"></i>i> Pillow Housing
+                                                      </h5>h5>
+                                                      <p class="mb-3">
+                                                                      The easiest way for college and grad students to find short-term sublets
+                                                                      near their campus — no broker fees, no long leases.
+                                                      </p>p>
+                                                      <div class="d-flex gap-3">
+                                                                      <a href="#" aria-label="Instagram" class="footer-social"><i class="bi bi-instagram fs-5"></i>i></a>a>
+                                                                      <a href="#" aria-label="Twitter / X" class="footer-social"><i class="bi bi-twitter-x fs-5"></i>i></a>a>
+                                                                      <a href="#" aria-label="LinkedIn" class="footer-social"><i class="bi bi-linkedin fs-5"></i>i></a>a>
+                                                      </div>div>
+                                        </div>div>
+
+                                        <!-- Quick links -->
+                                        <div class="col-6 col-md-2 offset-md-1">
+                                                      <h6>Explore</h6>
+                                                  <ul class="list-unstyled mb-0">
+                                                              <li class="mb-2"><a href="{% url 'landing' %}">Home</a>a></li>
+                                                              <li class="mb-2"><a href="{% url 'search_results' %}">Browse Listings</a>a></li>
+                                                              {% if user.is_authenticated %}
+                                                              <li class="mb-2"><a href="{% url 'create_listing' %}">Post a Listing</a>a></li>
+                                                              <li class="mb-2"><a href="{% url 'saved_listings' %}">Saved</a>a></li>
+                                                              {% else %}
+                                                              <li class="mb-2"><a href="{% url 'signup' %}">Sign Up</a>a></li>
+                                                              <li class="mb-2"><a href="{% url 'login' %}">Log In</a>a></li>
+                                                              {% endif %}
+                                                  </ul>ul>
+                                        </div>div>
+                            
+                                    <!-- Support / contact -->
+                                    <div class="col-6 col-md-2">
+                                              <h6>Support</h6>
+                                              <ul class="list-unstyled mb-0">
+                                                          <li class="mb-2"><a href="mailto:support@pillowhousing.com">Contact Us</a>a></li>
+                                                          <li class="mb-2"><a href="#">FAQ</a>a></li>
+                                                          <li class="mb-2"><a href="#">Safety Tips</a>a></li>
+                                              </ul>ul>
+                                    </div>div>
+                            
+                                    <!-- Contact -->
+                                    <div class="col-md-3">
+                                              <h6>Get in Touch</h6>
+                                              <p class="mb-1">
+                                                <i class="bi bi-envelope me-2"></i>i>
+                                                <a href="mailto:support@pillowhousing.com">support@pillowhousing.com</a>a>
+                                              </p>p>
+                                              <p class="mb-0 small text-white-50 mt-2">
+                                                We typically respond within 24 hours on business days.
+                                              </p>p>
+                                    </div>div>
+                            
+                            </div>div>
+                  
+                        <hr class="footer-divider">
+                  
+                        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
+                                <small class="text-white-50">&copy; 2026 Pillow Housing. All rights reserved.</small>small>
+                                <div class="footer-legal">
+                                          <a href="#">Privacy Policy</a>a>
+                                          <a href="#">Terms of Service</a>a>
+                                          <a href="#">Cookie Policy</a>a>
+                                </div>div>
+                        </div>div>
+                  </div>div>
+          </footer>footer>
     
-    <!-- Messages -->
-    {% if messages %}
-        <div class="container mt-3">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+      <!-- Bootstrap JS -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Main Content -->
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+      <!-- Leaflet JS — only loaded on pages that need it -->
+      {% block leaflet_js %}{% endblock %}
     
-    <!-- Footer -->
-    <footer class="text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5><i class="bi bi-house-heart-fill"></i> Pillow Housing</h5>
-                    <p>Student sublets made easy. Trusted by thousands of students nationwide.</p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h6>Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{% url 'landing' %}" class="text-decoration-none">Home</a></li>
-                        <li class="mb-2"><a href="{% url 'search_results' %}" class="text-decoration-none">Browse Listings</a></li>
-                        {% if user.is_authenticated %}
-                            <li class="mb-2"><a href="{% url 'create_listing' %}" class="text-decoration-none">Post Listing</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h6>Connect</h6>
-                    <p>
-                        <i class="bi bi-envelope"></i> support@pillowhousing.com<br>
-                        <i class="bi bi-phone"></i> (555) 123-4567
-                    </p>
-                </div>
-            </div>
-            <hr style="background-color: rgba(255,255,255,0.2); border: none; height: 1px;">
-            <div class="text-center mt-3">
-                <small>&copy; 2026 Pillow Housing. All rights reserved.</small>
-            </div>
-        </div>
-    </footer>
-    
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    {% block extra_js %}{% endblock %}
-</body>
-</html>
+      {% block extra_js %}{% endblock %}
+    </body>
+</html>html></h6></h6>
+                                                                    </li></li></span>
+    </body>
+      </style></title>
+    </head>
